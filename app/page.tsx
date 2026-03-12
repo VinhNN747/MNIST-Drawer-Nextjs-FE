@@ -106,6 +106,9 @@ export default function Home(){
         onMouseDown={startDraw}
         onMouseUp={stopDraw}
         onMouseMove={draw}
+        onTouchStart={startTouch}
+        onTouchEnd={stopDraw}
+        onTouchMove={drawTouch}
       />
 
       <br/><br/>
