@@ -1,65 +1,112 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+import { useRef, useState } from "react"
+
+export default function Home(){
+
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [result,setResult] = useState<number|null>(null)
+
+  const drawing = useRef(false)
+
+  function startDraw(){
+    drawing.current = true
+  }
+
+  function stopDraw(){
+    drawing.current = false
+  }
+
+  function draw(e:any){
+
+    if(!drawing.current) return
+
+    const canvas = canvasRef.current!
+    const ctx = canvas.getContext("2d")!
+
+    const rect = canvas.getBoundingClientRect()
+
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    ctx.fillStyle="white"
+    ctx.beginPath()
+    ctx.arc(x,y,10,0,Math.PI*2)
+    ctx.fill()
+  }
+
+  function clear(){
+
+    const canvas = canvasRef.current!
+    const ctx = canvas.getContext("2d")!
+
+    ctx.fillStyle="black"
+    ctx.fillRect(0,0,280,280)
+  }
+
+  function getPixels(){
+
+    const canvas = canvasRef.current!
+
+    const small = document.createElement("canvas")
+    small.width=28
+    small.height=28
+
+    const sctx = small.getContext("2d")!
+
+    sctx.drawImage(canvas,0,0,28,28)
+
+    const img = sctx.getImageData(0,0,28,28).data
+
+    const pixels:number[]=[]
+
+    for(let i=0;i<img.length;i+=4){
+      pixels.push(img[i]/255)
+    }
+
+    return pixels
+  }
+
+  async function predict(){
+
+    const pixels = getPixels()
+
+    const res = await fetch("http://localhost:8000/predict",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({pixels})
+    })
+
+    const data = await res.json()
+
+    setResult(data.digit)
+  }
+
+  return(
+
+    <div style={{padding:40}}>
+
+      <h2>Draw digit</h2>
+
+      <canvas
+        ref={canvasRef}
+        width={280}
+        height={280}
+        style={{border:"1px solid black"}}
+        onMouseDown={startDraw}
+        onMouseUp={stopDraw}
+        onMouseMove={draw}
+      />
+
+      <br/><br/>
+
+      <button onClick={predict}>Predict</button>
+      <button onClick={clear}>Clear</button>
+
+      <h3>Result: {result}</h3>
+
     </div>
-  );
+  )
 }
