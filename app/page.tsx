@@ -76,9 +76,9 @@ export default function Home(){
   }
 
   async function predict(){
-    const rootUrl = process.env.ROOT_URL || "http://localhost:8000"
+    const rootUrl = process.env.NEXT_PUBLIC_ROOT_URL || "http://localhost:8000"
+    console.log(rootUrl)
     const pixels = getPixels()
-    console.log(JSON.stringify(pixels))
     const res = await fetch(`${rootUrl}/predict`,{
       method:"POST",
       headers:{
