@@ -29,7 +29,7 @@ export default function Home(){
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
 
-    const r = 23
+    const r = 21
 
     const g = ctx.createRadialGradient(x,y,0,x,y,r)
 
@@ -92,32 +92,101 @@ export default function Home(){
     setResult(data.digit)
   }
 
-  return(
+  return (
+  <div
+    style={{
+      minHeight: "100vh",
+      background: "#0f172a",
+      color: "white",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      fontFamily: "sans-serif"
+    }}
+  >
+    <div
+      style={{
+        textAlign: "center",
+        padding: 30,
+        background: "#1e293b",
+        borderRadius: 16,
+        boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+        width: 340
+      }}
+    >
+      <h2 style={{ marginBottom: 10 }}>Draw a digit</h2>
 
-    <div style={{padding:40}}>
-
-      <h2>Draw digit</h2>
+      <p style={{ fontSize: 14, opacity: 0.7 }}>
+        Draw a number from 0–9
+      </p>
 
       <canvas
         ref={canvasRef}
         width={280}
         height={280}
-        style={{border:"1px solid white"}}
-        onMouseDown={startDraw}
-        onMouseUp={stopDraw}
-        onMouseMove={draw}
-        onTouchStart={startTouch}
-        onTouchEnd={stopDraw}
-        onTouchMove={drawTouch}
+        style={{
+          border: "2px solid #334155",
+          borderRadius: 12,
+          marginTop: 15,
+          background: "black",
+          touchAction: "none"
+        }}
+        onPointerDown={startDraw}
+        onPointerUp={stopDraw}
+        onPointerMove={draw}
       />
 
-      <br/><br/>
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          marginTop: 20,
+          justifyContent: "center"
+        }}
+      >
+        <button
+          onClick={predict}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            background: "#22c55e",
+            color: "white",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Predict
+        </button>
 
-      <button onClick={predict}>Predict</button>
-      <button onClick={clear}>Clear</button>
+        <button
+          onClick={clear}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            background: "#ef4444",
+            color: "white",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Clear
+        </button>
+      </div>
 
-      <h3>Result: {result}</h3>
-
+      {result !== null && (
+        <div
+          style={{
+            marginTop: 20,
+            fontSize: 26,
+            fontWeight: 700
+          }}
+        >
+          Result: {result}
+        </div>
+      )}
     </div>
+  </div>
   )
 }
