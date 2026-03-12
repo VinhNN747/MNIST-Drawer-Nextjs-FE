@@ -29,9 +29,17 @@ export default function Home(){
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
 
-    ctx.fillStyle="white"
+    const r = 23
+
+    const g = ctx.createRadialGradient(x,y,0,x,y,r)
+
+    g.addColorStop(0,"rgba(255,255,255,1)")
+    g.addColorStop(1,"rgba(255,255,255,0)")
+
+    ctx.fillStyle = g
+
     ctx.beginPath()
-    ctx.arc(x,y,10,0,Math.PI*2)
+    ctx.arc(x,y,r,0,Math.PI*2)
     ctx.fill()
   }
 
@@ -61,17 +69,17 @@ export default function Home(){
     const pixels:number[]=[]
 
     for(let i=0;i<img.length;i+=4){
-      pixels.push(img[i]/255)
+      pixels.push(img[i])
     }
 
     return pixels
   }
 
   async function predict(){
-
+    const rootUrl = process.env.ROOT_URL || "http://localhost:8000"
     const pixels = getPixels()
-
-    const res = await fetch("http://localhost:8000/predict",{
+    console.log(JSON.stringify(pixels))
+    const res = await fetch(`${rootUrl}/predict`,{
       method:"POST",
       headers:{
         "Content-Type":"application/json"
@@ -94,7 +102,7 @@ export default function Home(){
         ref={canvasRef}
         width={280}
         height={280}
-        style={{border:"1px solid black"}}
+        style={{border:"1px solid white"}}
         onMouseDown={startDraw}
         onMouseUp={stopDraw}
         onMouseMove={draw}
