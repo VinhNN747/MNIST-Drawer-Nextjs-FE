@@ -4,13 +4,8 @@ import { useEffect, useRef, useState } from "react"
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  const [mode, setMode] = useState<"draw" | "camera">("draw")
-  const [drawing, setDrawing] = useState(false)
-
-  const [result, setResult] = useState<number | null>(null)
-  const [confidence, setConfidence] = useState<number | null>(null)
+  const [result,setResult] = useState<number|null>(null)
+  const [confidence,setConfidence] = useState<number|null>(null)
 
   // ===== DRAW =====
   function startDraw() {
@@ -114,7 +109,6 @@ export default function Home() {
     const data = await res.json()
 
     setResult(data.digit)
-    setConfidence(data.confidence)
   }
 
   useEffect(() => {
@@ -308,20 +302,18 @@ export default function Home() {
           </button>
         </div>
 
-        {/* RESULT */}
-        {result !== null && (
-          <div
-            style={{
-              marginTop: 20,
-              fontSize: 26,
-              fontWeight: 700
-            }}
-          >
-            ---- Result: {result} ---- Confidence:{" "}
-            {(confidence! * 100).toFixed(2)}%
-          </div>
-        )}
-      </div>
+      {result !== null && (
+        <div
+          style={{
+            marginTop: 20,
+            fontSize: 26,
+            fontWeight: 700
+          }}
+        >
+          ---- Result: {result} ----Confidence: {(confidence! * 100).toFixed(2)}%
+        </div>
+      )}
     </div>
+  </div>
   )
 }
