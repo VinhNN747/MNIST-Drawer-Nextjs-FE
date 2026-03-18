@@ -6,6 +6,7 @@ export default function Home(){
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [result,setResult] = useState<number|null>(null)
+  const [confidence,setConfidence] = useState<number|null>(null)
 
   const drawing = useRef(false)
 
@@ -90,6 +91,7 @@ export default function Home(){
     const data = await res.json()
 
     setResult(data.digit)
+    setConfidence(data.confidence)
   }
 
   return (
@@ -183,7 +185,7 @@ export default function Home(){
             fontWeight: 700
           }}
         >
-          Result: {result}
+          ---- Result: {result} ----Confidence: {(confidence! * 100).toFixed(2)}%
         </div>
       )}
     </div>
